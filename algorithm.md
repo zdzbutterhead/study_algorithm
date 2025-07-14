@@ -423,9 +423,241 @@ def fib(n: int) -> int:
 3. 普通递归：把 1、2、3 层的积木先拆开，按顺序摆在桌子上（记住顺序），然后找到最后一层，再开始堆。
 4. 尾递归：一边拆积木，一边堆积木，不许要记住顺序，就拆完就堆。
 
+### 2.3  时间复杂度
+
+运行时间可以直观且准确地反映算法的效率。如果我们想准确预估一段代码的运行时间，应该如何操作呢？
+
+1. **确定运行平台**，包括硬件配置、编程语言、系统环境等，这些因素都会影响代码的运行效率。
+2. **评估各种计算操作所需的运行时间**，例如加法操作 `+` 需要 1 ns ，乘法操作 `*` 需要 10 ns ，打印操作 `print()` 需要 5 ns 等。
+3. **统计代码中所有的计算操作**，并将所有操作的执行时间求和，从而得到运行时间。
+
+但实际上，**统计算法的运行时间既不合理也不现实**。首先，我们不希望将预估时间和运行平台绑定，因为算法需要在各种不同的平台上运行。其次，我们很难获知每种操作的运行时间，这给预估过程带来了极大的难度。
+
+#### 2.3.1  统计时间增长趋势
+
+时间复杂度分析统计的不是算法运行时间，**而是算法运行时间随着数据量变大时的增长趋势**。
+
+```python
+# 算法 A 的时间复杂度：常数阶
+def algorithm_A(n: int):
+    print(0)
+# 算法 B 的时间复杂度：线性阶
+def algorithm_B(n: int):
+    for _ in range(n):
+        print(0)
+# 算法 C 的时间复杂度：常数阶
+def algorithm_C(n: int):
+    for _ in range(1000000):
+        print(0)
+```
+
+图 2-7 展示了以上三个算法函数的时间复杂度。
+
+- 算法 `A` 只有 个打印操作，算法运行时间不随着 增大而增长。我们称此算法的时间复杂度为“常数阶”。
+- 算法 `B` 中的打印操作需要循环 次，算法运行时间随着 增大呈线性增长。此算法的时间复杂度被称为“线性阶”。
+- 算法 `C` 中的打印操作需要循环 次，虽然运行时间很长，但它与输入数据大小 无关。因此 `C` 的时间复杂度和 `A` 相同，仍为“常数阶”。
+
+[![算法 A、B 和 C 的时间增长趋势](https://www.hello-algo.com/chapter_computational_complexity/time_complexity.assets/time_complexity_simple_example.png)](https://www.hello-algo.com/chapter_computational_complexity/time_complexity.assets/time_complexity_simple_example.png)
+
+图 2-7  算法 A、B 和 C 的时间增长趋势
+
+相较于直接统计算法的运行时间，时间复杂度分析有哪些特点呢？
+
+- **时间复杂度能够有效评估算法效率**。例如，算法 `B` 的运行时间呈线性增长，在n>1时比算法 `A` 更慢，在n>1000000时比算法 `C` 更慢。事实上，只要输入数据大小n足够大，复杂度为“常数阶”的算法一定优于“线性阶”的算法，这正是时间增长趋势的含义。
+- **时间复杂度的推算方法更简便**。显然，运行平台和计算操作类型都与算法运行时间的增长趋势无关。因此在时间复杂度分析中，我们可以简单地将所有计算操作的执行时间视为相同的“单位时间”，从而将“计算操作运行时间统计”简化为“计算操作数量统计”，这样一来估算难度就大大降低了。
+- **时间复杂度也存在一定的局限性**。例如，尽管算法 `A` 和 `C` 的时间复杂度相同，但实际运行时间差别很大。同样，尽管算法 `B` 的时间复杂度比 `C` 高，但在输入数据大小n较小时，算法 `B` 明显优于算法 `C` 。对于此类情况，我们时常难以仅凭时间复杂度判断算法效率的高低。当然，尽管存在上述问题，复杂度分析仍然是评判算法效率最有效且常用的方法。
+
+#### 2.3.2  函数渐近上界
+
+```python
+def algorithm(n: int):
+    a = 1      # +1
+    a = a + 1  # +1
+    a = a * 2  # +1
+    # 循环 n 次
+    for i in range(n):  # +1
+        print(0)        # +1
+```
+
+设算法的操作数量是一个关于输入数据大小n的函数，记为T(n)，则以上函数的操作数量为：T(n)=3+2n
 
 
+T(n)是一次函数，说明其运行时间的增长趋势是线性的，因此它的时间复杂度是线性阶。
 
+我们将线性阶的时间复杂度记为O(n)，这个数学符号称为大O记号（big-O notation），表示函数T(n)的渐近上界（asymptotic upper bound）。
+
+时间复杂度分析本质上是计算“操作数量T(n)”的渐近上界，它具有明确的数学定义。
+
+如图 2-8 所示，计算渐近上界就是寻找一个函数f(n)，使得当n趋向于无穷大时，T(n)和f(n)处于相同的增长级别，仅相差一个常数系数c。
+
+[![函数的渐近上界](https://www.hello-algo.com/chapter_computational_complexity/time_complexity.assets/asymptotic_upper_bound.png)](https://www.hello-algo.com/chapter_computational_complexity/time_complexity.assets/asymptotic_upper_bound.png)
+
+图 2-8  函数的渐近上界
+
+#### 2.3.3  推算方法
+
+1. 第一步：统计操作数量(其实就是看最深层循环次数或递归次数)
+
+   针对代码，逐行从上到下计算即可。然而，由于上述c*f(n)中的常数系数c可以取任意大小，**因此操作数量T(n)中的各种系数、常数项都可以忽略**。根据此原则，可以总结出以下计数简化技巧。
+
+   1. **忽略T(n)中的常数**。因为它们都与n无关，所以对时间复杂度不产生影响。
+   2. **省略所有系数**。例如，循环2n次、5n+1次等，都可以简化记为n次，因为n前面的系数对时间复杂度没有影响。
+   3. **循环嵌套时使用乘法**。总操作数量等于外层循环和内层循环操作数量之积，每一层循环依然可以分别套用第 `1.` 点和第 `2.` 点的技巧。
+
+2. 第二步：判断渐近上界
+
+   **时间复杂度由T(n)中最高阶的项来决定**。这是因为在n趋于无穷大时，最高阶的项将发挥主导作用，其他项的影响都可以忽略。
+
+#### 2.3.4  常见类型
+
+![image-20250714161719846](C:\Users\zdz1411\AppData\Roaming\Typora\typora-user-images\image-20250714161719846.png)
+
+1. 常数阶
+
+   常数阶的操作数量与输入数据大小 无关，即不随着 的变化而变化。
+
+2.  线性阶
+
+    线性阶的操作数量相对于输入数据大小 以线性级别增长。线性阶通常出现在单层循环中：
+
+3.  平方阶
+
+    平方阶的操作数量相对于输入数据大小n以平方级别增长。平方阶通常出现在嵌套循环中，外层循环和内层循环的时间复杂度都为O(n)，因此总体的时间复杂度为O(n^2)
+
+4.  指数阶
+
+    生物学的“细胞分裂”是指数阶增长的典型例子：初始状态为1个细胞，分裂一轮后变为2个，分裂两轮后变为4个，以此类推，分裂n轮后有$2^n$个细胞。
+
+    图 2-11 和以下代码模拟了细胞分裂的过程，时间复杂度为O($2^n$) 。请注意，输入n表示分裂轮数，返回值 `count` 表示总分裂次数。
+
+    ```python
+    def exponential(n: int) -> int:
+        """指数阶（循环实现）"""
+        count = 0
+        base = 1
+        # 细胞每轮一分为二，形成数列 1, 2, 4, 8, ..., 2^(n-1)
+        for _ in range(n):
+            for _ in range(base):
+                count += 1
+            base *= 2
+        # count = 1 + 2 + 4 + 8 + .. + 2^(n-1) = 2^n - 1
+        return count
+    ```
+
+    [![指数阶的时间复杂度](https://www.hello-algo.com/chapter_computational_complexity/time_complexity.assets/time_complexity_exponential.png)](https://www.hello-algo.com/chapter_computational_complexity/time_complexity.assets/time_complexity_exponential.png)
+
+    图 2-11  指数阶的时间复杂度
+
+    在实际算法中，指数阶常出现于递归函数中。例如在以下代码中，其递归地一分为二，经过 次分裂后停止：
+
+    ```python
+    def exp_recur(n: int) -> int:
+        """指数阶（递归实现）"""
+        if n == 1:
+            return 1
+        return exp_recur(n - 1) + exp_recur(n - 1) + 1
+    ```
+
+    指数阶增长非常迅速，在穷举法（暴力搜索、回溯等）中比较常见。对于数据规模较大的问题，指数阶是不可接受的，通常需要使用动态规划或贪心算法等来解决。
+
+5.  对数阶
+
+    与指数阶相反，对数阶反映了“每轮缩减到一半”的情况。设输入数据大小为n，由于每轮缩减到一半，因此循环次数是$\log_2 n$，即$2^n$的反函数。
+
+    图 2-12 和以下代码模拟了“每轮缩减到一半”的过程，时间复杂度为O($log_2 n$)，简记为O($log_ n$)：
+
+    ```python
+    def logarithmic(n: int) -> int:
+        """对数阶（循环实现）"""
+        count = 0
+        while n > 1:
+            n = n / 2
+            count += 1
+        return count
+    ```
+
+    ![对数阶的时间复杂度](C:\Users\zdz1411\AppData\Roaming\Typora\typora-user-images\image-20250714165738224.png)
+
+    图 2-12  对数阶的时间复杂度
+
+    与指数阶类似，对数阶也常出现于递归函数中。以下代码形成了一棵高度为$log_2 n$的递归树
+
+    ```python
+    def log_recur(n: int) -> int:
+        """对数阶（递归实现）"""
+        if n <= 1:
+            return 0
+        return log_recur(n / 2) + 1
+    ```
+
+    对数阶常出现于基于分治策略的算法中，体现了“一分为多”和“化繁为简”的算法思想。它增长缓慢，是仅次于常数阶的理想的时间复杂度。
+
+    ![image-20250714165946651](C:\Users\zdz1411\AppData\Roaming\Typora\typora-user-images\image-20250714165946651.png)
+
+6.  线性对数阶
+
+    线性对数阶常出现于嵌套循环中，两层循环的时间复杂度分别为O($log n$)和O(n)。
+
+    ```python
+    def linear_log_recur(n: int) -> int:
+        """线性对数阶"""
+        if n <= 1:
+            return 1
+        # 一分为二，子问题的规模减小一半
+        count = linear_log_recur(n // 2) + linear_log_recur(n // 2)
+        # 当前子问题包含 n 个操作
+        for _ in range(n):
+            count += 1
+        return count
+    ```
+
+    图 2-13 展示了线性对数阶的生成方式。二叉树的每一层的操作总数都为n，树共有$log_2 n+1$层，因此时间复杂度为O($nlog n$)。
+
+    [![线性对数阶的时间复杂度](https://www.hello-algo.com/chapter_computational_complexity/time_complexity.assets/time_complexity_logarithmic_linear.png)](https://www.hello-algo.com/chapter_computational_complexity/time_complexity.assets/time_complexity_logarithmic_linear.png)
+
+    图 2-13  线性对数阶的时间复杂度
+
+    主流排序算法的时间复杂度通常为O($nlog n$)，例如快速排序、归并排序、堆排序等。
+
+7.  阶乘阶
+
+    阶乘阶对应数学上的“全排列”问题。给定n个互不重复的元素，求其所有可能的排列方案，方案数量为：
+    $$
+    n!=n*(n-1)*(n-2)*···*2*1
+    $$
+    阶乘通常使用递归实现。如图 2-14 和以下代码所示，第一层分裂出n个，第二层分裂出n-1个，以此类推，直至第n层时停止分裂
+
+    ```python
+    def factorial_recur(n: int) -> int:
+        """阶乘阶（递归实现）"""
+        if n == 0:
+            return 1
+        count = 0
+        # 从 1 个分裂出 n 个
+        for _ in range(n):
+            count += factorial_recur(n - 1)
+        return count
+    ```
+
+    [![阶乘阶的时间复杂度](https://www.hello-algo.com/chapter_computational_complexity/time_complexity.assets/time_complexity_factorial.png)](https://www.hello-algo.com/chapter_computational_complexity/time_complexity.assets/time_complexity_factorial.png)
+
+    图 2-14  阶乘阶的时间复杂度
+
+    请注意，因为当$n>=4$时恒有$n!>2^n$ ，所以阶乘阶比指数阶增长得更快，在n较大时也是不可接受的。
+
+#### 2.3.5  最差、最佳、平均时间复杂度
+
+“最差时间复杂度”对应函数渐近上界，使用大O记号表示。相应地，“最佳时间复杂度”对应函数渐近下界，用Ω记号表示：
+
+值得说明的是，我们在实际中很少使用最佳时间复杂度，因为通常只有在很小概率下才能达到，可能会带来一定的误导性。**而最差时间复杂度更为实用，因为它给出了一个效率安全值**，让我们可以放心地使用算法。
+
+从上述示例可以看出，最差时间复杂度和最佳时间复杂度只出现于“特殊的数据分布”，这些情况的出现概率可能很小，并不能真实地反映算法运行效率。相比之下，**平均时间复杂度可以体现算法在随机输入数据下的运行效率**，用Θ记号来表示。
+
+对于部分算法，我们可以简单地推算出随机数据分布下的平均情况。比如上述示例，由于输入数组是被打乱的，因此元素1出现在任意索引的概率都是相等的，那么算法的平均循环次数就是数组长度的一半n/2，平均时间复杂度为Θ(n/2)=Θ(n) 。
+
+但对于较为复杂的算法，计算平均时间复杂度往往比较困难，因为很难分析出在数据分布下的整体数学期望。在这种情况下，我们通常使用最差时间复杂度作为算法效率的评判标准。
+
+![为什么很少看到Θ符号？](C:\Users\zdz1411\AppData\Roaming\Typora\typora-user-images\image-20250714171708044.png)
 
 
 
