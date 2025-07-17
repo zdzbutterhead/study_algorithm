@@ -112,4 +112,41 @@ def bubble_sort(nums:list[int])->list:
 '''
 
 
+'''
+# 使用多种基本数据类型来初始化数组
+numbers1: list[int] = [0] * 5
+numbers2 = list(range(5))
+print(numbers1)
+print(numbers2)
+'''
 
+
+
+import sys
+
+eng1 = "a"
+eng2 = "ab"
+eng3 = "abc"
+
+chn1 = "哈"
+chn2 = "哈啰"
+chn2_eng1 = "哈啰a"
+
+bmp1 = "𨊻"
+bmp2 = "𨊻𨋾"
+bmp2_eng1 = "𨊻𨋾a"
+
+print("\n英文：") # 英文长度为 1
+print(eng1 + ": ", sys.getsizeof(eng1))
+print(eng2 + ": ", sys.getsizeof(eng2))
+print(eng3 + ": ", sys.getsizeof(eng3))
+
+print("\n中文:")
+print(chn1 + ": ", sys.getsizeof(chn1))
+print(chn2 + ": ", sys.getsizeof(chn2))
+print(chn2_eng1 + ": ", sys.getsizeof(chn2_eng1))
+
+print("\n补充平面:")
+print(bmp1 + ": ", sys.getsizeof(bmp1))
+print(bmp2 + ": ", sys.getsizeof(bmp2))
+print(bmp2_eng1 + ": ", sys.getsizeof(bmp2_eng1))
