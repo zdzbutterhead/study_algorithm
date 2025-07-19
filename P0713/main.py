@@ -109,16 +109,16 @@ def bubble_sort(nums:list[int])->list:
             if nums[j] > nums[j+1]:
                 nums[j], nums[j+1] = nums[j+1], nums[j]
     return nums
-'''
 
 
-'''
+
+
 # 使用多种基本数据类型来初始化数组
 numbers1: list[int] = [0] * 5
 numbers2 = list(range(5))
 print(numbers1)
 print(numbers2)
-'''
+
 
 
 
@@ -150,3 +150,114 @@ print("\n补充平面:")
 print(bmp1 + ": ", sys.getsizeof(bmp1))
 print(bmp2 + ": ", sys.getsizeof(bmp2))
 print(bmp2_eng1 + ": ", sys.getsizeof(bmp2_eng1))
+
+
+
+
+import random
+
+def random_access(nums:list[int])->int:
+    return nums[random.randint(0,len(nums)-1)]
+
+if __name__ == "__main__":
+    nums = [1,2,3,4,5]
+    print(random_access(nums))
+    print('随机访问结果为：', random_access(nums))
+    print(f'随机访问结果为：{random_access(nums)}')
+
+
+
+
+def insert(nums:list[int],index:int,values:int):
+    if index<0 or index>len(nums):
+        raise IndexError("index out of range")
+    for i in range(len(nums)-1,index,-1):
+        nums[i]=nums[i-1]
+    nums[index] = values
+
+if __name__ == "__main__":
+    nums = [1,2,3,4,5]
+    #insert(nums,2,6)
+    nums.insert(2,6)
+    print(nums)
+
+
+
+
+def delete(nums:list[int],index:int):
+    if index<0 or index>len(nums)-1:
+        raise IndexError("index out of range")
+    for i in range(index,len(nums)-1):
+        nums[i] = nums[i+1]
+
+if __name__ == "__main__":
+    nums = [1,2,3,4,5]
+    #delete(nums,2)
+    #nums.pop(2)
+    #nums.remove(2)
+    #del  nums[2]
+    print(nums)
+
+
+
+
+def traverse(nums:list[int]):
+    count1 = 0
+    count2 = 0
+    for i in range(len(nums)):
+        count1 += nums[i]
+    for num in nums:
+        count2 += num
+    return count1,count2
+
+if __name__ == '__main__':
+    nums = [1,2,3,4,5]
+    print(traverse(nums))
+
+
+
+
+def find(nums:list[int],values:int):
+    for i in range(len(nums)):
+        if nums[i] == values:
+            return i
+    return -1
+
+
+
+
+def extend(nums:list[int],enlarge:int):
+    res = [0] * (len(nums) + enlarge)
+    for i in range(len(nums)):
+        res[i] = nums[i]
+    return res
+'''
+
+
+
+class ListNode:
+    def __init__(self,val:int):
+        self.val = val
+        self.next:ListNode|None = None
+
+def insert(n0:ListNode,P:ListNode):
+    P.next = n0.next
+    n0.next = P
+
+
+
+if __name__ == '__main__':
+    n0 = ListNode(1)
+    n1 = ListNode(2)
+    n2 = ListNode(3)
+    n3 = ListNode(4)
+    n4 = ListNode(5)
+    n0.next = n1
+    n1.next = n2
+    n2.next = n3
+    n3.next = n4
+
+    p = ListNode(0)
+    insert(n0,p)
+
+    print(n0.next.val)
