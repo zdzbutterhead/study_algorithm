@@ -231,7 +231,7 @@ def extend(nums:list[int],enlarge:int):
     for i in range(len(nums)):
         res[i] = nums[i]
     return res
-'''
+
 
 
 
@@ -261,3 +261,62 @@ if __name__ == '__main__':
     insert(n0,p)
 
     print(n0.next.val)
+
+
+
+
+class MyList:
+    def __init__(self):
+        self._capacity: int = 10
+        self._arr: list[int] = [0]*self._capacity
+        self._size: int = 0
+        self._extend_ratio: int = 2
+
+    def size(self)->int:
+        return self._size
+
+    def capacity(self)->int:
+        return self._capacity
+
+    def get(self,index:int):
+        if index < 0 or index >= self._size:
+            raise IndexError("index out of range")
+        return self._arr[index]
+
+    def add(self,value:int):
+        if self._size == self._capacity:
+            self.extend_capacity()
+        self._arr[self._size] = value
+        self._size += 1
+
+    def insert(self,index:int,value:int):
+        if index < 0 or index >= self._size:
+            raise IndexError("index out of range")
+        if self._size == self._capacity:
+            self.extend_capacity()
+        for i in range(self._size-1,index-1,-1):
+            self._arr[i+1] = self._arr[i]
+        self._arr[index] = value
+        self._size += 1
+
+    def remove(self,index:int):
+        if index < 0 or index >= self._size:
+            raise IndexError("index out of range")
+        for i in range(index,self._size-1):
+            self._arr[i] = self._arr[i+1]
+        self._size -= 1
+
+    def extend_capacity(self):
+        self._arr = self._arr + [0] * self.capacity() * (self._extend_ratio - 1)
+        # 更新列表容量
+        self._capacity = len(self._arr)
+
+    def to_array(self) -> list[int]:
+        return self._arr[:self._size]
+'''
+
+
+
+res = [0] * 4
+
+print(res)
