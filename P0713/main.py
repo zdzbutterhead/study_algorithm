@@ -313,10 +313,368 @@ class MyList:
 
     def to_array(self) -> list[int]:
         return self._arr[:self._size]
-'''
+
 
 
 
 res = [0] * 4
 
 print(res)
+
+
+
+
+class LinkedListNode:
+
+    def __init__(self):
+        self.peek :ListNode|None = None
+        self.size :int = 0
+
+    def size(self) -> int:
+        return self.size
+
+    def is_empty(self) -> bool:
+        return self.size == 0
+
+    def push(self, value: int):
+        node = ListNode(value)
+        node.next = self.peek
+        self.peek = node
+        self.size += 1
+
+    def pop(self):
+        num = self.peek()
+        self.peek =self.peek.next
+        self.size -= 1
+        return num
+
+    def peek(self) -> int:
+        if self.is_empty():
+            raise IndexError("peek from empty list")
+        return self.peek.value
+
+    def to_list(self) -> list[int]:
+        res = []
+        node = self.peek
+        while node:
+            res.append(node.value)
+            node = node.next
+        return res
+
+
+
+
+class ArrayStack:
+
+    def __init__(self):
+        self._stack:list[int]=[]
+
+    def size(self) -> int:
+        return len(self.stack)
+
+    def is_empty(self) ->bool:
+        return self.size() == 0
+
+    def push(self,item):
+        self._stack.append(item)
+
+    def pop(self):
+        if self.is_empty():
+            raise IndexError("pop from empty stack")
+        return self._stack.pop()
+
+    def peek(self):
+        if self.is_empty():
+            raise IndexError("peek from empty stack")
+        return self._stack[-1]
+
+    def to_list(self):
+        return self._stack
+
+
+
+
+from collections import deque
+que:deque[int] = deque()
+
+que.append(1)
+que.append(3)
+que.append(2)
+que.append(5)
+que.append(4)
+
+front:int = que[0]
+
+pop :int =que.left.pop()
+
+size:int = len(que)
+
+is_empty:bool = len(que) == 0
+
+
+
+
+class LinkedListQueue:
+
+    def __init__(self):
+        self._front:LinkedListNode|None = None
+        self._rear:LinkedListNode|None = None
+        self._size:int = 0
+
+    def size(self) -> int:
+        return self._size
+
+    def is_empty(self) -> bool:
+        return self._size == 0
+
+    def push(self, value: int):
+        node = ListNode(value)
+        if self._front is None:
+            self._front = node
+            self._rear = node
+        else:
+            self._rear.next = node
+            self._rear = node
+        self._size += 1
+
+    def pop(self):
+        if self.is_empty():
+            raise IndexError("pop from empty queue")
+        return self._front.value
+
+    def to_list(self):
+        queue = []
+        temp = self._front
+        while temp:
+            queue.append(temp.value)
+            temp = temp.next
+        return queue
+
+
+
+
+class ArrayQueue:
+
+    def __init__(self,size:int):
+        self._nums: list[int] = [0] * size
+        self._front: int = 0
+        self._size: int = 0
+
+    def capacity(self)->int:
+        return len(self._nums)
+
+    def size(self):
+        return self.size()
+
+    def is_empty(self):
+        return self.size() == 0
+
+    def push(self,value:int):
+        if self.size() == self.capacity():
+            raise IndexError("queue is full")
+        rear :int = (self._front + self._size)%self.capacity()
+        self._nums[rear] = num
+        self._size += 1
+
+    def pop(self):
+        if self.is_empty():
+            raise IndexError("pop from empty queue")
+        num = self._nums[self._front]
+        self._front = (self._front + 1) % self.capacity()
+        self._size -= 1
+        return num
+
+    def peek(self):
+        if self.is_empty():
+            raise IndexError("peek from empty queue")
+        return self._nums[self._front]
+
+    def to_list(self):
+        res = [0]*self.size()
+        j =self._front
+        for i in range(self.size()):
+            res[i] = self.nums[(j%self.capacity())]
+            j=j+1
+        return res
+
+
+
+
+from collections import deque
+
+# 初始化双向队列
+deq: deque[int] = deque()
+
+# 元素入队
+deq.append(2)      # 添加至队尾
+deq.append(5)
+deq.append(4)
+deq.appendleft(3)  # 添加至队首
+deq.appendleft(1)
+
+# 访问元素
+front: int = deq[0]  # 队首元素
+rear: int = deq[-1]  # 队尾元素
+
+# 元素出队
+pop_front: int = deq.popleft()  # 队首元素出队
+pop_rear: int = deq.pop()       # 队尾元素出队
+
+# 获取双向队列的长度
+size: int = len(deq)
+
+# 判断双向队列是否为空
+is_empty: bool = len(deq) == 0
+
+
+
+
+class ListNode:
+
+    def __init__(self, val=0):
+        self.value =val
+        self.next: ListNode | None = None
+        self.prev: ListNode | None = None
+
+class LinkedListQueue:
+
+    def __init__(self):
+        self._front: ListNode | None = None
+        self._rear: ListNode | None = None
+        self._size: int = 0
+
+    def size(self):
+        return self._size
+
+    def is_empty(self):
+        return self._size == 0
+
+    def push(self, value: int,is_front:bool):
+        node = ListNode(value)
+        if self.is_empty():
+            self._front = node
+            self._rear = node
+        elif is_front:
+            node.next = self._front
+            self._front.prev = node
+            self._front = node
+        else:
+            self._rear.next = node
+            node.prev = self._rear
+            self._rear = node
+        self._size += 1
+
+    def push_first(self, value: int):
+        self.push(value,True)
+
+    def push_last(self,value: int):
+        self.push(value,False)
+
+    def pop(self,is_front:bool):
+        if self.is_empty():
+            raise IndexError('pop from empty queue')
+        if is_front:
+            value = self._front.value
+            fnext: ListNode | None = self._front.next
+            if fnext is not None:
+                fnext.prev = None
+                self._front.next = None
+            self._front = fnext
+        else:
+            value = self._rear.value
+            rprev: ListNode | None = self._rear.prev
+            if rprev is not None:
+                rprev.next = None
+                self._rear.prev = None
+            self._rear = rprev
+        self._size -= 1
+        return value
+
+    def pop_first(self):
+        return self.pop(True)
+
+    def pop_last(self):
+        return self.pop(False)
+
+    def peek_first(self):
+        if self.is_empty():
+            raise IndexError('peek from empty queue')
+        return self._front.value
+
+    def peek_last(self):
+        if self.is_empty():
+            raise IndexError('peek from empty queue')
+        return self._rear.value
+
+    def to_list(self):
+        res = []*self.size()
+        node = self._front
+        while node is not None:
+            res.append(node.value)
+            node = node.next
+        return res
+
+
+
+
+class ArrayDeque:
+
+    def __init__(self,capacity:int):
+        self._nums: list[int] = [0]*capacity
+        self._front: int = 0
+        self._size: int = 0
+
+    def capacity(self):
+        return len(self._nums)
+
+    def size(self):
+        return self._size
+
+    def is_empty(self):
+        return self.size() == 0
+
+    def index(self,index:int):
+        return (self._front + index)%self.capacity()
+
+    def push_front(self,value:int):
+        if self.size() == self.capacity():
+            raise IndexError('queue is full')
+        self._front = self.index(self._front - 1)
+        self._nums[self._front] = value
+        self._size += 1
+
+    def push_last(self,value:int):
+        if self.size() == self.capacity():
+            raise IndexError('queue is full')
+        self._nums[self.index(self._front + self._size)] = value
+        self._size += 1
+
+    def pop_first(self):
+        num = self.peek_first()
+        self._front = self.index(self._front + 1)
+        self._size -= 1
+        return num
+
+    def pop_last(self):
+        num = self.peek_last()
+        self._size -= 1
+        return num
+
+    def peek_first(self):
+        if self.is_empty():
+            raise IndexError('peek from empty queue')
+        return self._nums[self._front]
+
+    def peek_last(self):
+        if self.is_empty():
+            raise IndexError('peek from empty queue')
+        return self._nums[self.index(self._front + self._size - 1)]
+
+    def to_list(self):
+        return self._nums[self.index(self._front): self.index(self._front + self._size)]
+    '''
+
+
+
+
+
