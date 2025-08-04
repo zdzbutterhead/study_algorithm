@@ -672,9 +672,209 @@ class ArrayDeque:
 
     def to_list(self):
         return self._nums[self.index(self._front): self.index(self._front + self._size)]
-    '''
 
 
 
 
+hmap: dict = {}
 
+hmap[12836] = "小哈"
+hmap[15937] = "小啰"
+hmap[16750] = "小算"
+hmap[13276] = "小法"
+hmap[10583] = "小鸭"
+
+# 查询操作
+# 向哈希表中输入键 key ，得到值 value
+name: str = hmap[15937]
+
+# 删除操作
+# 在哈希表中删除键值对 (key, value)
+hmap.pop(10583)
+
+print(name)
+
+
+
+
+class Pair:
+
+    def __init__(self,key:int,value:int):
+        self.key = key
+        self.value = value
+
+class ArrayHashMap:
+
+    def __init__(self):
+        self.buckets: list[Pair | None] = [None]*100
+
+    def hash_func(self, key: int) -> int:
+        index: int = key % 100
+        return index
+
+    def get(self,key:int) -> str:
+        index: int = self.hash_func(key)
+        pair: Pair | None = self.buckets[index]
+        if pair is None:
+            return None
+        return pair.value
+
+    def put(self, key: int, value: int):
+        pair = Pair(key,value)
+        index: int = self.hash_func(key)
+        self.buckets[index] = pair
+
+    def remove(self, key: int):
+        index: int = self.hash_func(key)
+        self,buckets[index] = None
+
+    def entry_set(self) -> list[Pair]:
+        return [pair for pair in self.buckets if pair is not None]
+
+    def key_set(self):
+        return [pair.key for pair in self.entry_set()]
+
+    def value_set(self):
+        return [pair.value for pair in self.entry_set()]
+
+    def print(self):
+        print(self.key_set())
+
+
+
+
+class HashMapChaining:
+
+    def __init__(self):
+        self.size = 0
+        self.capacity = 4
+        self.load_threshold = 2.0/3.0
+        self.extend_ration = 2
+        self.buckets = [[] for _ in range(self.capacity)]
+
+    def hash_func(self, key: int) -> int:
+        return key%self.capacity
+
+    def load_factor(self) -> float:
+        return self.size/self.capacity
+
+    def get(self, key: int):
+        index: int = self.hash_func(key)
+        bucket = self.buckets[index]
+        for pair in bucket:
+            if pair.key == key:
+                return pair.value
+        return None
+
+    def put(self, key, value):
+        if self.load_factor() > self.load_threshold:
+            self.extend()
+        index = self,hash_func(key)
+        bucket = self.buckets[index]
+        for pair in bucket:
+            if pair.key == key:
+                pair.value = value
+                return
+        pair = Pair(key,value)
+        bucket.append(pair)
+        self.size += 1
+
+    def remove(self, key):
+        index = self.hash_func(key)
+        bucket = self.buckets[index]
+        for pair in bucket:
+            if pair.key == key:
+                bucket.remove(pair)
+                self.size -= 1
+                break
+
+    def extend(self):
+        buckets = self.buckets
+        self.capacity *= self.extend_ration
+        self.buckets = [[] for _ in range(self.capacity)]
+        self.size = 0
+        for bucket in buckets:
+            for pair in bucket:
+                self.put(pair.key, pair.value)
+
+    def print(self):
+        for bucket in buckets:
+            res = []
+            for pair in bucket:
+                res.append(str(pair.key) + ": " + str(pair.value))
+            print(res)
+
+
+
+
+class HashMapOpenAddressing:
+
+    def __init__(self):
+        self.size = 0
+        self.capacity = 4
+        self.load_threshold = 2.0/3.0
+        self.extend_ration = 2
+        self.buckets = [None] * self.capacity
+        self.TOMBSTONE = Pair(-1, '-1')
+
+    def hash_func(self, key):
+        return key % self.capacity
+
+    def load_factor(self):
+        return self.size / self.capacity
+
+    def find_bucket(self, key):
+        index = self.hash_func(key)
+        first_tombstone = -1
+        while self.buckets[index] is not None:
+            if self.buckets[index].key == key:
+                if first_tombstone != -1:
+                    self.buckets[first_tombstone] = self.buckets[index]
+                    self.buckets[index] = self.TOMBSTONE
+                return index
+            if first_tombstone == -1 and self.buckets[index] is self.TOMBSTONE:
+                first_tombstone = index
+            index = (index + 1) % self.capacity
+        return index if first_tombstone == -1 else first_tombstone
+
+    def get(self,key):
+        index = self.find_bucket(key)
+        if self.buckets[index] not in [None, self.TOMBSTONE]:
+            return self.buckets[index].value
+        return None
+
+    def put(self, key, value):
+        if self.load_factor() > self.load_threshold:
+            self.extend()
+        index = self.find_bucket(key)
+        if self.buckets[index] not in [None,self.TOMBSTONE]:
+            self.buckets[index].value = value
+            return
+        self.buckets[index] = Pair(key, value)
+        self.size += 1
+
+    def remove(self, key):
+        index = self.find_bucket(key)
+        if self.buckets[index] not in [None, self.TOMBSTONE]:
+            self.buckets[index] = self.TOMBSTONE
+            self.size -= 1
+
+    def extend(self):
+        buckets_temp = self.buckets
+        self.capacity *= self.extend_ration
+        self.buckets = [None] * self.capacity
+        self.size = 0
+        for pair in buckets_temp:
+            if pair is not None and pair is not self.TOMBSTONE:
+                self.put(pair.key, pair.value)
+
+    def print(self):
+        """打印哈希表"""
+        for pair in self.buckets:
+            if pair is None:
+                print("None")
+            elif pair is self.TOMBSTONE:
+                print("TOMBSTONE")
+            else:
+                print(pair.key, "->", pair.val)
+'''
