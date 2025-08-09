@@ -877,7 +877,7 @@ class HashMapOpenAddressing:
                 print("TOMBSTONE")
             else:
                 print(pair.key, "->", pair.val)
-'''
+
 
 
 
@@ -908,3 +908,89 @@ def rot_hash(key:str) -> int:
     for c in key:
         hash = (hash << 4) ^ (hash >> 28) ^ ord(c)
     return hash % modulus
+
+
+
+
+def level_order(root: TreeNode | None) -> list[int]:
+    queue: deque[TreeNode] = deque()
+    queue.append(root)
+    res = []
+    while queue:
+        node = queue.popleft()
+        res.append(node.val)
+        if node.left is not None:
+            queue.append(node.left)
+        if node.right is not None:
+            queue.append(node.right)
+    return res
+
+
+
+
+def pre_order(root: TreeNode | None):
+    if root is None:
+        return
+    res.append(root.val)
+    pre_order(root.left)
+    pre_order(root.right)
+
+def in_order(root: TreeNode | None):
+    if root is None:
+        return
+    in_order(root.left)
+    res.append(root.val)
+    in_order(root.right)
+
+def post_order(root: TreeNode | None):
+    if root is None:
+        return
+    post_order(root.left)
+    post_order(root.right)
+    res.append(root.val)
+    '''
+
+
+
+def pre_order(root: TreeNode | None):
+    """前序遍历"""
+    # 访问优先级：根节点 -> 左子树 -> 右子树
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        if node is None:
+            continue
+        res.append(node.val)
+        stack.append(node.right)
+        stack.append(node.left)
+
+def in_order(root: TreeNode | None):
+    """中序遍历"""
+    # 访问优先级：左子树 -> 根节点 -> 右子树
+    stack = [root]
+    while stack:
+        node = stack[-1]
+        if node is None:
+            stack.pop()
+            if not stack:
+                return
+            node = stack.pop()
+            res.append(node.val)
+            stack.append(node.right)
+            continue
+        stack.append(node.left)
+
+    assert False
+
+def post_order(root: TreeNode | None):
+    """后序遍历"""
+    # 访问优先级：左子树 -> 右子树 -> 根节点
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        if node is None:
+            continue
+        res.append(node.val)
+        stack.append(node.left)
+        stack.append(node.right)
+    res.reverse()
