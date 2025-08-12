@@ -948,49 +948,209 @@ def post_order(root: TreeNode | None):
     post_order(root.left)
     post_order(root.right)
     res.append(root.val)
-    '''
 
 
 
-def pre_order(root: TreeNode | None):
-    """前序遍历"""
-    # 访问优先级：根节点 -> 左子树 -> 右子树
-    stack = [root]
+class TreeNode:
+    """二叉树节点类"""
+
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+
+def preorder_traversal(root: TreeNode):
+    """前序遍历：根 -> 左 -> 右（非递归）"""
+    if not root:
+        return []
+
+    result = []
+    stack = [root]  # 栈初始化，先放入根节点
+
     while stack:
-        node = stack.pop()
-        if node is None:
-            continue
-        res.append(node.val)
-        stack.append(node.right)
-        stack.append(node.left)
+        node = stack.pop()  # 弹出栈顶节点
+        result.append(node.val)  # 访问根节点
 
-def in_order(root: TreeNode | None):
-    """中序遍历"""
-    # 访问优先级：左子树 -> 根节点 -> 右子树
-    stack = [root]
-    while stack:
-        node = stack[-1]
-        if node is None:
-            stack.pop()
-            if not stack:
-                return
-            node = stack.pop()
-            res.append(node.val)
+        # 注意：栈是后进先出，所以先放右子树，再放左子树
+        if node.right:
             stack.append(node.right)
-            continue
-        stack.append(node.left)
+        if node.left:
+            stack.append(node.left)
 
-    assert False
+    return result
 
-def post_order(root: TreeNode | None):
-    """后序遍历"""
-    # 访问优先级：左子树 -> 右子树 -> 根节点
+
+def inorder_traversal(root: TreeNode):
+    """中序遍历：左 -> 根 -> 右（非递归）"""
+    if not root:
+        return []
+
+    result = []
+    stack = []
+    current = root
+
+    while current or stack:
+        # 先遍历左子树，将所有左节点入栈
+        while current:
+            stack.append(current)
+            current = current.left
+
+        # 弹出栈顶节点（最左节点）
+        current = stack.pop()
+        result.append(current.val)  # 访问根节点
+
+        # 转向右子树
+        current = current.right
+
+    return result
+
+
+def postorder_traversal(root: TreeNode):
+    """后序遍历：左 -> 右 -> 根（非递归）"""
+    if not root:
+        return []
+
+    result = []
     stack = [root]
+    visited = set()  # 记录已访问的节点
+
     while stack:
-        node = stack.pop()
-        if node is None:
-            continue
-        res.append(node.val)
-        stack.append(node.left)
-        stack.append(node.right)
-    res.reverse()
+        node = stack[-1]  # 查看栈顶节点（不弹出）
+
+        # 如果节点的左右子树都已访问，或者是叶子节点，则访问该节点
+        if (not node.left and not node.right) or node in visited:
+            stack.pop()
+            result.append(node.val)
+        else:
+            # 标记当前节点为已访问（表示其左右子树即将被处理）
+            visited.add(node)
+            # 先放右子树，再放左子树（栈是后进先出）
+            if node.right:
+                stack.append(node.right)
+            if node.left:
+                stack.append(node.left)
+
+    return result
+
+
+
+
+class ArrayBinaryTree:
+
+    def __init__(self, arr: list[int]):
+        self._tree = list(arr)
+
+    def size(self):
+        return len(self._tree)
+
+    def val(self,i: int) -> int | None:
+        if i < 0 or i >= self.size():
+            return None
+        return self._tree[i]
+
+    def left(self, i: int) -> int | None:
+        return 2 * i + 1
+
+    def right(self, i: int) -> int | None:
+        return 2 * i + 2
+
+    def parent(self, i: int) -> int | None:
+        return (i - 1) // 2
+
+    def level_order(self) -> list[int]:
+        self.res = []
+        for i in range(self.size()):
+            if self.val(i) is not None:
+                self.res.append(self.val(i))
+        return self.res
+
+    def dfs(self, i: int, order: str):
+        if self.val(i) is None:
+            return
+        if order == "pre":
+            self.res.append(self.val(i))
+        self.dfs(self.left(i), order)
+        if order == "in":
+            self.res.append(self.val(i))
+        self.dfs(self.right(i),order)
+        if order == "post":
+            self.res.append(self.val(i))
+
+    def pre_order(self) -> list[int]:
+        self.res = []
+        self.dfs(0, order = "pre")
+        return self.res
+
+    def in_order(self) -> list[int]:
+        self.res = []
+        self.dfs(0, order = "in")
+        return self.res
+
+    def post_order(self) -> list[int]:
+        self.res = []
+        self.dfs(0, order = "post")
+        return self.res
+
+
+
+
+def remove(self, num: int):
+    if self._root is None:
+        return
+    cur, pre = self._root, num
+    while cur is not None:
+        if cur.val == num:
+            break
+        pre = cur
+        if cur.val < num:
+            cur = cur.right
+        else:
+            cur = cur.left
+
+    if cur is None:
+        return
+
+    if cur.left is None or cur.right is None:
+        child = cur.left or cur.right
+        if cur != self._root:
+            if pre.left == cur:
+                pre.left = child
+            else:
+                pre.right = child
+        else:
+            self._root = child
+    else:
+        tmp = cur.right
+        while tmp.left is not None:
+            tmp = tmp.left
+        self.remove(tmp.val)
+        cur.val = tmp.val
+'''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
