@@ -1226,6 +1226,89 @@ class TreeNode:
 
 
 
+import heapq
+
+min_heap, flag = [], 1
+
+max_heap, flag = [], -1
+
+heapq.heappush(max_heap, flag * 1)
+heapq.heappush(max_heap, flag * 2)
+heapq.heappush(max_heap, flag * 2)
+heapq.heappush(max_heap, flag * 5)
+heapq.heappush(max_heap, flag * 4)
+
+peek: int = flag * max_heap[0] # 5
+
+val = flag * heapq.heappop(max_heap) # 5
+val = flag * heapq.heappop(max_heap) # 4
+val = flag * heapq.heappop(max_heap) # 3
+val = flag * heapq.heappop(max_heap) # 2
+val = flag * heapq.heappop(max_heap) # 1
+
+size: int = len(max_heap)
+
+# 判断堆是否为空
+is_empty: bool = not max_heap
+
+# 输入列表并建堆
+min_heap: list[int] = [1, 3, 2, 5, 4]
+heapq.heapify(min_heap)
+
+
+
+
+def leaf(self, i: int):
+    return 2 * 1 + 1
+
+def right(self, i: int):
+    return 2 * i + 2
+
+def parent(self, i: int):
+    return (i - 1) // 2
+
+def peek(self) -> int:
+    return self.max_heap[0]
+
+
+
+
+def push(self, value: int):
+    self.max_heap.append(value)
+    self.sift_up(self.size()-1)
+
+def sift_up(self, i: int):
+    while True:
+        parent_index = self.parent(i)
+        if parent_index < 0 or self.max_heap[parent_index] >= self.max_heap[i]:
+            break
+        self.swap(i,parent_index)
+        i = parent_index
+
+
+
+
+def pop(self) -> int:
+    if self.is_empty():
+        raise IndexError("pop from an empty heap")
+    self.swap(0, self.size()-1)
+    value = self.max_heap.pop()
+    self.sift_down(0)
+    return value
+
+def sift_down(self,i: int):
+    while True:
+        left,right,max = self.left(i),self.right(i),i
+        if left < self.size() and self.max_heap[left] < self.max_heap[max]:
+            max = left
+        if right < self.size() and self.max_heap[right] <self.max_heap[max]:
+            max = right
+        if max == i:
+            break
+        self.swap(i,max)
+        i = max
+
+
 
 
 
