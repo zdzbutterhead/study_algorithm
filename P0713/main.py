@@ -1222,7 +1222,7 @@ class TreeNode:
                 node.val = temp.val
         self.update_height(node)
         return self.rotate(node)
-        '''
+
 
 
 
@@ -1307,6 +1307,14 @@ def sift_down(self,i: int):
             break
         self.swap(i,max)
         i = max
+'''
+
+
+
+def __init__(self, nums: list[int]):
+    self.max_heap = nums
+    for i in range(self.parent(self.size()-1),-1,-1):
+        self.sift_down(i)
 
 
 
