@@ -4981,6 +4981,324 @@ $$
 | 地铁线路 | 站点 | 站点间的连通性       | 最短路线推荐 |
 | 太阳系   | 星体 | 星体间的万有引力作用 | 行星轨道计算 |
 
+### 9.2  图的基础操作
+
+图的基础操作可分为对“边”的操作和对“顶点”的操作。在“邻接矩阵”和“邻接表”两种表示方法下，实现方式有所不同。
+
+#### 9.2.1  基于邻接矩阵的实现
+
+给定一个顶点数量为n的无向图，则各种操作的实现方式如图 9-7 所示。
+
+- **添加或删除边**：直接在邻接矩阵中修改指定的边即可，使用$O(1)$时间。而由于是无向图，因此需要同时更新两个方向的边。
+- **添加顶点**：在邻接矩阵的尾部添加一行一列，并全部填0即可，使用$O(n)$时间。
+- **删除顶点**：在邻接矩阵中删除一行一列。当删除首行首列时达到最差情况，需要将$(n-1)^2$个元素“向左上移动”，从而使用$O(n^2)$时间。
+- **初始化**：传入n个顶点，初始化长度为n的顶点列表 `vertices` ，使用$O(n)$时间；初始化n*n大小的邻接矩阵 `adjMat` ，使用$O(n^2)$时间。
+
+![邻接矩阵的初始化、增删边、增删顶点](https://www.hello-algo.com/chapter_graph/graph_operations.assets/adjacency_matrix_step1_initialization.png)
+
+![adjacency_matrix_add_edge](https://www.hello-algo.com/chapter_graph/graph_operations.assets/adjacency_matrix_step2_add_edge.png)
+
+![adjacency_matrix_remove_edge](https://www.hello-algo.com/chapter_graph/graph_operations.assets/adjacency_matrix_step3_remove_edge.png)
+
+![adjacency_matrix_add_vertex](https://www.hello-algo.com/chapter_graph/graph_operations.assets/adjacency_matrix_step4_add_vertex.png)
+
+![adjacency_matrix_remove_vertex](https://www.hello-algo.com/chapter_graph/graph_operations.assets/adjacency_matrix_step5_remove_vertex.png)
+
+图 9-7  邻接矩阵的初始化、增删边、增删顶点
+
+以下是基于邻接矩阵表示图的实现代码：
+
+```python
+class GraphAdjMat:
+    """基于邻接矩阵实现的无向图类"""
+
+    def __init__(self, vertices: list[int], edges: list[list[int]]):
+        """构造方法"""
+        # 顶点列表，元素代表“顶点值”，索引代表“顶点索引”
+        self.vertices: list[int] = []
+        # 邻接矩阵，行列索引对应“顶点索引”
+        self.adj_mat: list[list[int]] = []
+        # 添加顶点
+        for val in vertices:
+            self.add_vertex(val)
+        # 添加边
+        # 请注意，edges 元素代表顶点索引，即对应 vertices 元素索引
+        for e in edges:
+            self.add_edge(e[0], e[1])
+
+    def size(self) -> int:
+        """获取顶点数量"""
+        return len(self.vertices)
+
+    def add_vertex(self, val: int):
+        """添加顶点"""
+        n = self.size()
+        # 向顶点列表中添加新顶点的值
+        self.vertices.append(val)
+        # 在邻接矩阵中添加一行
+        new_row = [0] * n
+        self.adj_mat.append(new_row)
+        # 在邻接矩阵中添加一列
+        for row in self.adj_mat:
+            row.append(0)
+
+    def remove_vertex(self, index: int):
+        """删除顶点"""
+        if index >= self.size():
+            raise IndexError()
+        # 在顶点列表中移除索引 index 的顶点
+        self.vertices.pop(index)
+        # 在邻接矩阵中删除索引 index 的行
+        self.adj_mat.pop(index)
+        # 在邻接矩阵中删除索引 index 的列
+        for row in self.adj_mat:
+            row.pop(index)
+
+    def add_edge(self, i: int, j: int):
+        """添加边"""
+        # 参数 i, j 对应 vertices 元素索引
+        # 索引越界与相等处理
+        if i < 0 or j < 0 or i >= self.size() or j >= self.size() or i == j:
+            raise IndexError()
+        # 在无向图中，邻接矩阵关于主对角线对称，即满足 (i, j) == (j, i)
+        self.adj_mat[i][j] = 1
+        self.adj_mat[j][i] = 1
+
+    def remove_edge(self, i: int, j: int):
+        """删除边"""
+        # 参数 i, j 对应 vertices 元素索引
+        # 索引越界与相等处理
+        if i < 0 or j < 0 or i >= self.size() or j >= self.size() or i == j:
+            raise IndexError()
+        self.adj_mat[i][j] = 0
+        self.adj_mat[j][i] = 0
+
+    def print(self):
+        """打印邻接矩阵"""
+        print("顶点列表 =", self.vertices)
+        print("邻接矩阵 =")
+        print_matrix(self.adj_mat)
+```
+
+#### 9.2.2  基于邻接表的实现
+
+设无向图的顶点总数为n、边总数为m，则可根据图 9-8 所示的方法实现各种操作。
+
+- **添加边**：在顶点对应链表的末尾添加边即可，使用$O(1)$时间。因为是无向图，所以需要同时添加两个方向的边。
+- **删除边**：在顶点对应链表中查找并删除指定边，使用$O(m)$时间。在无向图中，需要同时删除两个方向的边。
+- **添加顶点**：在邻接表中添加一个链表，并将新增顶点作为链表头节点，使用$O(1)$时间。
+- **删除顶点**：需遍历整个邻接表，删除包含指定顶点的所有边，使用$O(n+m)$时间。
+- **初始化**：在邻接表中创建n个顶点和2m条边，使用$O(n+m)$时间。
+
+![邻接表的初始化、增删边、增删顶点](https://www.hello-algo.com/chapter_graph/graph_operations.assets/adjacency_list_step1_initialization.png)
+
+![adjacency_list_add_edge](https://www.hello-algo.com/chapter_graph/graph_operations.assets/adjacency_list_step2_add_edge.png)
+
+![adjacency_list_remove_edge](https://www.hello-algo.com/chapter_graph/graph_operations.assets/adjacency_list_step3_remove_edge.png)
+
+![adjacency_list_add_vertex](https://www.hello-algo.com/chapter_graph/graph_operations.assets/adjacency_list_step4_add_vertex.png)
+
+![adjacency_list_remove_vertex](https://www.hello-algo.com/chapter_graph/graph_operations.assets/adjacency_list_step5_remove_vertex.png)
+
+图 9-8  邻接表的初始化、增删边、增删顶点
+
+以下是邻接表的代码实现。对比图 9-8 ，实际代码有以下不同。
+
+- 为了方便添加与删除顶点，以及简化代码，我们使用列表（动态数组）来代替链表。
+- 使用哈希表来存储邻接表，`key` 为顶点实例，`value` 为该顶点的邻接顶点列表（链表）。
+
+另外，我们在邻接表中使用 `Vertex` 类来表示顶点，这样做的原因是：如果与邻接矩阵一样，用列表索引来区分不同顶点，那么假设要删除索引为 的顶点，则需遍历整个邻接表，将所有大于 的索引全部减 ，效率很低。而如果每个顶点都是唯一的 `Vertex` 实例，删除某一顶点之后就无须改动其他顶点了。
+
+```python
+class GraphAdjList:
+    """基于邻接表实现的无向图类"""
+
+    def __init__(self, edges: list[list[Vertex]]):
+        """构造方法"""
+        # 邻接表，key：顶点，value：该顶点的所有邻接顶点
+        self.adj_list = dict[Vertex, list[Vertex]]()
+        # 添加所有顶点和边
+        for edge in edges:
+            self.add_vertex(edge[0])
+            self.add_vertex(edge[1])
+            self.add_edge(edge[0], edge[1])
+
+    def size(self) -> int:
+        """获取顶点数量"""
+        return len(self.adj_list)
+
+    def add_edge(self, vet1: Vertex, vet2: Vertex):
+        """添加边"""
+        if vet1 not in self.adj_list or vet2 not in self.adj_list or vet1 == vet2:
+            raise ValueError()
+        # 添加边 vet1 - vet2
+        self.adj_list[vet1].append(vet2)
+        self.adj_list[vet2].append(vet1)
+
+    def remove_edge(self, vet1: Vertex, vet2: Vertex):
+        """删除边"""
+        if vet1 not in self.adj_list or vet2 not in self.adj_list or vet1 == vet2:
+            raise ValueError()
+        # 删除边 vet1 - vet2
+        self.adj_list[vet1].remove(vet2)
+        self.adj_list[vet2].remove(vet1)
+
+    def add_vertex(self, vet: Vertex):
+        """添加顶点"""
+        if vet in self.adj_list:
+            return
+        # 在邻接表中添加一个新链表
+        self.adj_list[vet] = []
+
+    def remove_vertex(self, vet: Vertex):
+        """删除顶点"""
+        if vet not in self.adj_list:
+            raise ValueError()
+        # 在邻接表中删除顶点 vet 对应的链表
+        self.adj_list.pop(vet)
+        # 遍历其他顶点的链表，删除所有包含 vet 的边
+        for vertex in self.adj_list:
+            if vet in self.adj_list[vertex]:
+                self.adj_list[vertex].remove(vet)
+
+    def print(self):
+        """打印邻接表"""
+        print("邻接表 =")
+        for vertex in self.adj_list:
+            tmp = [v.val for v in self.adj_list[vertex]]
+            print(f"{vertex.val}: {tmp},")
+```
+
+#### 9.2.3  效率对比
+
+设图中共有n个顶点和m条边，表 9-2 对比了邻接矩阵和邻接表的时间效率和空间效率。请注意，邻接表（链表）对应本文实现，而邻接表（哈希表）专指将所有链表替换为哈希表后的实现。
+
+表 9-2  邻接矩阵与邻接表对比
+
+|              | 邻接矩阵 | 邻接表（链表） | 邻接表（哈希表） |
+| :----------- | :------- | :------------- | ---------------- |
+| 判断是否邻接 | $O(1)$   | $O(n)$         | $O(1)$           |
+| 添加边       | $O(1)$   | $O(1)$         | $O(1)$           |
+| 删除边       | $O(1)$   | $O(n)$         | $O(1)$           |
+| 添加顶点     | $O(n)$   | $O(1)$         | $O(1)$           |
+| 删除顶点     | $O(n^2)$ | $O(n+m)$       | $O(n)$           |
+| 内存空间占用 | $O(n^2)$ | $O(n+m)$       | $O(n+m)$         |
+
+观察表 9-2 ，似乎邻接表（哈希表）的时间效率与空间效率最优。但实际上，在邻接矩阵中操作边的效率更高，只需一次数组访问或赋值操作即可。综合来看，邻接矩阵体现了“以空间换时间”的原则，而邻接表体现了“以时间换空间”的原则。
+
+邻接表存储的图中，删除一条边的时间复杂度为 **O(d)**（d 为边的端点的度），最坏情况下为 **O(n)**（当某个顶点与所有其他顶点相连时）。
+
+### 9.3  图的遍历
+
+树代表的是“一对多”的关系，而图则具有更高的自由度，可以表示任意的“多对多”关系。因此，我们可以把树看作图的一种特例。显然，**树的遍历操作也是图的遍历操作的一种特例**。
+
+图和树都需要应用搜索算法来实现遍历操作。图的遍历方式也可分为两种：广度优先遍历和深度优先遍历。
+
+#### 9.3.1  广度优先遍历
+
+**广度优先遍历是一种由近及远的遍历方式，从某个节点出发，始终优先访问距离最近的顶点，并一层层向外扩张**。如图 9-9 所示，从左上角顶点出发，首先遍历该顶点的所有邻接顶点，然后遍历下一个顶点的所有邻接顶点，以此类推，直至所有顶点访问完毕。
+
+![图的广度优先遍历](https://www.hello-algo.com/chapter_graph/graph_traversal.assets/graph_bfs.png)
+
+图 9-9  图的广度优先遍历
+
+1. 算法实现
+
+   BFS 通常借助队列来实现，代码如下所示。队列具有“先入先出”的性质，这与 BFS 的“由近及远”的思想异曲同工。
+
+   1. 将遍历起始顶点 `startVet` 加入队列，并开启循环。
+   2. 在循环的每轮迭代中，弹出队首顶点并记录访问，然后将该顶点的所有邻接顶点加入到队列尾部。
+   3. 循环步骤 `2.` ，直到所有顶点被访问完毕后结束。
+
+   为了防止重复遍历顶点，我们需要借助一个哈希集合 `visited` 来记录哪些节点已被访问。
+
+   > 哈希集合可以看作一个只存储 `key` 而不存储 `value` 的哈希表，它可以在$O(1)$时间复杂度下进行 `key` 的增删查改操作。根据 `key` 的唯一性，哈希集合通常用于数据去重等场景。
+
+   ```python
+   def graph_bfs(graph: GraphAdjList, start_vet: Vertex) -> list[Vertex]:
+       """广度优先遍历"""
+       # 使用邻接表来表示图，以便获取指定顶点的所有邻接顶点
+       # 顶点遍历序列
+       res = []
+       # 哈希集合，用于记录已被访问过的顶点
+       # set[Vertex]是 Python 的类型注解（Type Hint），表示 visited 是一个集合（set），且集合中元素的类型为 Vertex（顶点类，图中顶点的对象类型）。
+       visited = set[Vertex]([start_vet])
+       # 队列用于实现 BFS
+       que = deque[Vertex]([start_vet])
+       # 以顶点 vet 为起点，循环直至访问完所有顶点
+       while len(que) > 0:
+           vet = que.popleft()  # 队首顶点出队
+           res.append(vet)  # 记录访问顶点
+           # 遍历该顶点的所有邻接顶点
+           for adj_vet in graph.adj_list[vet]:
+               if adj_vet in visited:
+                   continue  # 跳过已被访问的顶点
+               que.append(adj_vet)  # 只入队未访问的顶点
+               visited.add(adj_vet)  # 标记该顶点已被访问
+       # 返回顶点遍历序列
+       return res
+   ```
+
+   **广度优先遍历的序列**不唯一。广度优先遍历只要求按“由近及远”的顺序遍历，**而多个相同距离的顶点的遍历顺序允许被任意打乱**。以图 9-10 为例，顶点1、3的访问顺序可以交换，顶点2、4、6的访问顺序也可以任意交换。
+
+2.  复杂度分析
+
+    **时间复杂度**：所有顶点都会入队并出队一次，使用$O(|V|)$时间；在遍历邻接顶点的过程中，由于是无向图，因此所有边都会被访问2次，使用$O(2|E|)$时间；总体使用$O(|V|+|E|)$时间。
+
+    **空间复杂度**：列表 `res` ，哈希集合 `visited` ，队列 `que` 中的顶点数量最多为|V|，使用$O(|V|)$空间。
+
+#### 9.3.2  深度优先遍历
+
+**深度优先遍历是一种优先走到底、无路可走再回头的遍历方式**。如图 9-11 所示，从左上角顶点出发，访问当前顶点的某个邻接顶点，直到走到尽头时返回，再继续走到尽头并返回，以此类推，直至所有顶点遍历完成。
+
+![图的深度优先遍历](https://www.hello-algo.com/chapter_graph/graph_traversal.assets/graph_dfs.png)
+
+图 9-11  图的深度优先遍历
+
+1. 算法实现
+
+   这种“走到尽头再返回”的算法范式通常基于递归来实现。与广度优先遍历类似，在深度优先遍历中，我们也需要借助一个哈希集合 `visited` 来记录已被访问的顶点，以避免重复访问顶点。
+
+   ```python
+   def dfs(graph: GraphAdjList, visited: set[Vertex], res: list[Vertex], vet: Vertex):
+       """深度优先遍历辅助函数"""
+       res.append(vet)  # 记录访问顶点
+       visited.add(vet)  # 标记该顶点已被访问
+       # 遍历该顶点的所有邻接顶点
+       for adjVet in graph.adj_list[vet]:
+           if adjVet in visited:
+               continue  # 跳过已被访问的顶点
+           # 递归访问邻接顶点
+           dfs(graph, visited, res, adjVet)
+   
+   def graph_dfs(graph: GraphAdjList, start_vet: Vertex) -> list[Vertex]:
+       """深度优先遍历"""
+       # 使用邻接表来表示图，以便获取指定顶点的所有邻接顶点
+       # 顶点遍历序列
+       res = []
+       # 哈希集合，用于记录已被访问过的顶点
+       visited = set[Vertex]()
+       dfs(graph, visited, res, start_vet)
+       return res
+   ```
+
+   深度优先遍历的算法流程如图 9-12 所示。
+
+   - **直虚线代表向下递推**，表示开启了一个新的递归方法来访问新顶点。
+   - **曲虚线代表向上回溯**，表示此递归方法已经返回，回溯到了开启此方法的位置。
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
